@@ -1,0 +1,12 @@
+node_modules
+dist
+.wrangler
+.dev.vars
+
+# Change them to your taste:
+wrangler.toml
+yarn.lock
+pnpm-lock.yaml
+
+# generated
+public/static/index.css
