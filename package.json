@@ -4,15 +4,15 @@
     "dev": "concurrently \"npm:dev:*\"",
     "dev:web": "vite",
     "dev:css": "npx tailwindcss -i ./src/css/index.css -o ./public/static/index.css --watch",
-    "build": "concurrently \"npm:build:*\"",
-    "build:web": "vite build",
-    "build:css": "npx tailwindcss -i ./src/css/index.css -o ./public/static/index.css",
-    "build:client": "vite build --outDir dist/client --ssrManifest",
-    "build:server": "vite build --outDir dist/server --ssr src/entry-server.js",
+    "build": "rimraf ./dist && npm run ssr:client && cp -r ./dist ./dist2 && npm run build:server && npm run build:css && rm -r ./dist/static && mv ./dist2/* ./dist && rm -r ./dist2 && mv ./dist/assets/* ./dist/static",
+    "build:server": "vite build --config vite.config.ts",
+    "ssr:client": "vite build --config vite.config.client.ts",
+    "build:css": "npx tailwindcss -i ./src/css/index.css -o ./dist/static/index.css",
     "preview": "wrangler pages dev dist",
     "deploy": "$npm_execpath run build && wrangler pages deploy dist"
   },
   "dependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
     "hono": "^3.10.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -28,8 +28,11 @@
     "concurrently": "^8.2.2",
     "postcss": "^8.4.32",
     "prettier": "^3.1.0",
+    "rimraf": "^5.0.5",
     "tailwindcss": "^3.3.5",
-    "vite": "^5.0.5",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.6",
     "wrangler": "^3.19.0"
   }
 }
