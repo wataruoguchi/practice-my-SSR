@@ -1,8 +1,9 @@
-```txt
-npm install
-npm run dev
-```
+# Hono + vite + React SSR
 
-```txt
-npm run deploy
-```
+Practice to learn the build system
+
+## This does not work...
+
+With DEV mode, the HMR does not work.
+
+With preview mode, it works but the build script is ugly.

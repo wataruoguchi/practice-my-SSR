@@ -1,17 +1,21 @@
 import { Hono } from "hono";
 import { renderer } from "./renderer";
-import { Home } from "./pages/home";
+import { render } from "./entry-server";
+import htmlFileDev from "../index.html?raw";
+import htmlFile from "../dist/index.html?raw";
+
+const isProd = import.meta.env.PROD;
+const template = isProd ? htmlFile : htmlFileDev;
 
 const app = new Hono();
 
-app.get("*", renderer);
-
-app.get("/", (c) => {
-  return c.render(<Home />);
-});
-app.get("/:name", (c) => {
-  const id = c.req.param("name");
-  return c.render(<h1>{id}!</h1>);
+app.get("/", async (c) => {
+  return c.html(
+    renderer(template, {
+      head: "<title>Hello</title>",
+      content: render().html,
+    }),
+  );
 });
 
 export default app;

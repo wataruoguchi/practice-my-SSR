@@ -1,25 +1,35 @@
-import "hono";
-import { jsxRenderer } from "hono/jsx-renderer";
+const APP_HEAD_TAG = "<!--app-head-->";
+const APP_HTML_TAG = "<!--ssr-outlet-->";
+const APP_SCRIPT_TAG = "<!--app-script-->";
 
-declare module "hono" {
-  interface ContextRenderer {
-    (content: string | Promise<string>, props?: { title?: string }): Response;
-  }
+const isProd = import.meta.env.PROD;
+
+// Inspired by https://vitejs.dev/guide/ssr.html
+export function renderer(
+  template: string,
+  {
+    head,
+    content,
+  }: {
+    head: string;
+    content: string;
+  },
+): string {
+  return template
+    .replace(APP_HEAD_TAG, head)
+    .replace(APP_HTML_TAG, content)
+    .replace(APP_SCRIPT_TAG, `${!isProd ? addRefreshRuntime() : ""}`)
+    .replace("/assets/", "/static/");
 }
 
-export const renderer = jsxRenderer(
-  ({ children, title }) => {
-    return (
-      <html>
-        <head>
-          <link href="/static/index.css" rel="stylesheet" />
-          <title>{title}</title>
-        </head>
-        <body>{children}</body>
-      </html>
-    );
-  },
-  {
-    docType: true,
-  },
-);
+// https://github.com/vitejs/vite/issues/12876#issuecomment-1510434993
+function addRefreshRuntime(): string {
+  return `<script type="module">
+      import RefreshRuntime from "/@react-refresh";
+      RefreshRuntime.injectIntoGlobalHook(window);
+      window.$RefreshReg$ = () => {};
+      window.$RefreshSig$ = () => (type) => type;
+      window.__vite_plugin_react_preamble_installed__ = true;
+    </script>
+  `;
+}
